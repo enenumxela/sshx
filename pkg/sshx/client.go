@@ -3,7 +3,6 @@ package sshx
 import (
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"os"
 	"strings"
@@ -127,6 +126,7 @@ func (client *Client) GetShell() (err error) {
 	return
 }
 
+// RunCommand
 func (client *Client) RunCommand(command *Command) (err error) {
 	session, err := client.SSH.NewSession()
 	if err != nil {
@@ -135,21 +135,11 @@ func (client *Client) RunCommand(command *Command) (err error) {
 
 	defer session.Close()
 
-	if err = client.PrepareCommand(session, command); err != nil {
-		log.Fatal(err)
-	}
+	// if err = client.PrepareCommand(session, command); err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	if err = session.Run(command.CMD); err != nil {
-		return
-	}
-
-	return
-}
-
-func (client *Client) PrepareCommand(session *ssh.Session, cmd *Command) (err error) {
-	cmd.CMD = "source ~/.profile && " + cmd.CMD
-
-	for _, env := range cmd.Env {
+	for _, env := range command.Env {
 		variable := strings.Split(env, "=")
 		if len(variable) != 2 {
 			continue
@@ -160,36 +150,87 @@ func (client *Client) PrepareCommand(session *ssh.Session, cmd *Command) (err er
 		}
 	}
 
-	if cmd.Stdin != nil {
+	if command.Stdin != nil {
 		stdin, err := session.StdinPipe()
 		if err != nil {
 			return err
 		}
 
-		go io.Copy(stdin, cmd.Stdin)
+		go io.Copy(stdin, command.Stdin)
 	}
 
-	if cmd.Stdout != nil {
+	if command.Stdout != nil {
 		stdout, err := session.StdoutPipe()
 		if err != nil {
 			return err
 		}
 
-		go io.Copy(cmd.Stdout, stdout)
+		go io.Copy(command.Stdout, stdout)
 	}
 
-	if cmd.Stderr != nil {
+	if command.Stderr != nil {
 		stderr, err := session.StderrPipe()
 		if err != nil {
 			return err
 		}
 
-		go io.Copy(cmd.Stderr, stderr)
+		go io.Copy(command.Stderr, stderr)
+	}
+
+	command.CMD = "source ~/.profile && " + command.CMD
+
+	if err = session.Run(command.CMD); err != nil {
+		return
 	}
 
 	return
 }
 
+// func (client *Client) PrepareCommand(session *ssh.Session, cmd *Command) (err error) {
+// 	cmd.CMD = "source ~/.profile && " + cmd.CMD
+
+// 	for _, env := range cmd.Env {
+// 		variable := strings.Split(env, "=")
+// 		if len(variable) != 2 {
+// 			continue
+// 		}
+
+// 		if err := session.Setenv(variable[0], variable[1]); err != nil {
+// 			return err
+// 		}
+// 	}
+
+// 	if cmd.Stdin != nil {
+// 		stdin, err := session.StdinPipe()
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		go io.Copy(stdin, cmd.Stdin)
+// 	}
+
+// 	if cmd.Stdout != nil {
+// 		stdout, err := session.StdoutPipe()
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		go io.Copy(cmd.Stdout, stdout)
+// 	}
+
+// 	if cmd.Stderr != nil {
+// 		stderr, err := session.StderrPipe()
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		go io.Copy(cmd.Stderr, stderr)
+// 	}
+
+// 	return
+// }
+
+// Close
 func (client *Client) Close() (err error) {
 	if client == nil {
 		return
