@@ -68,26 +68,6 @@ func New(configuration *Configuration) (client *Client, err error) {
 	return
 }
 
-// func (client *Client) NewSession() (session *ssh.Session, err error) {
-// 	if session, err = client.SSH.NewSession(); err != nil {
-// 		return
-// 	}
-
-// 	modes := ssh.TerminalModes{
-// 		ssh.ECHO:          0,     // disable echoing
-// 		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
-// 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
-// 	}
-
-// 	if err = session.RequestPty("xterm", 80, 40, modes); err != nil {
-// 		session.Close()
-
-// 		return
-// 	}
-
-// 	return
-// }
-
 // GetShell
 func (client *Client) GetShell() (err error) {
 	session, err := client.SSH.NewSession()
