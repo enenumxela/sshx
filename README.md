@@ -9,5 +9,5 @@
 Install pillow as you normally would for any Go package:
 
 ```bash
-go get -u github.com/enenumxela/sshx/pkg/client
+go get -u github.com/enenumxela/sshx/pkg/sshx
 ```
