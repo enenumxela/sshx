@@ -14,35 +14,28 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// GetKeyPair will attempt to get the keypair from a file and will fail back
-// to generating a new set and saving it to the file. Returns pub, priv, err
-func ReadGenerateKeyPair(keyPairName string) (string, string, error) {
-	// read keys from file
-	pub, priv, err := ReadKeyPair(keyPairName)
+func ReadOrGenerate(keyPairName string) (string, string, error) {
+	pub, priv, err := Read(keyPairName)
 	if err != nil {
-		goto GENERATE_KEYS
+		goto GENERATE
 	} else {
 		return string(pub), string(priv), nil
 	}
 
-	// generate keys and save to file
-GENERATE_KEYS:
-	pub, priv, err = GenerateKeyPair()
+GENERATE:
+	pub, priv, err = Generate()
 	if err != nil {
 		return "", "", fmt.Errorf("failed to generate keys - %s", err)
 	}
 
-	if err = WriteKeyPair(keyPairName, pub, priv); err != nil {
+	if err = Write(keyPairName, pub, priv); err != nil {
 		return "", "", fmt.Errorf("failed to write file - %s", err)
 	}
 
 	return pub, priv, nil
 }
 
-// GenerateKeyPair make a pair of public and private keys for SSH access.
-// Public key is encoded in the format for inclusion in an OpenSSH authorized_keys file.
-// Private Key generated is PEM encoded
-func GenerateKeyPair() (string, string, error) {
+func Generate() (string, string, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return "", "", err
@@ -59,7 +52,6 @@ func GenerateKeyPair() (string, string, error) {
 		return "", "", err
 	}
 
-	// generate public key
 	pub, err := ssh.NewPublicKey(&privateKey.PublicKey)
 	if err != nil {
 		return "", "", err
@@ -70,7 +62,7 @@ func GenerateKeyPair() (string, string, error) {
 	return string(public), private.String(), nil
 }
 
-func ReadKeyPair(keyPair string) (string, string, error) {
+func Read(keyPair string) (string, string, error) {
 	_, err := os.Stat(keyPair)
 	if err != nil {
 		return "", "", err
@@ -89,7 +81,7 @@ func ReadKeyPair(keyPair string) (string, string, error) {
 	return string(pub), string(priv), nil
 }
 
-func WriteKeyPair(keyPairName, pub, priv string) error {
+func Write(keyPairName, pub, priv string) error {
 	directory := filepath.Dir(keyPairName)
 
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
