@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/enenumxela/sshx/pkg/authentication"
+	"github.com/enenumxela/sshx/authentication"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"

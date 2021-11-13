@@ -11,5 +11,5 @@ A simple abstraction around [ssh](https://pkg.go.dev/golang.org/x/crypto/ssh) an
 Install sshx as you normally would for any Go package:
 
 ```bash
-go get -u github.com/enenumxela/sshx/pkg/sshx
+go get -u github.com/enenumxela/sshx
 ```
