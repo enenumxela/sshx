@@ -135,10 +135,6 @@ func (client *Client) RunCommand(command *Command) (err error) {
 
 	defer session.Close()
 
-	// if err = client.PrepareCommand(session, command); err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	for _, env := range command.Env {
 		variable := strings.Split(env, "=")
 		if len(variable) != 2 {
@@ -185,50 +181,6 @@ func (client *Client) RunCommand(command *Command) (err error) {
 
 	return
 }
-
-// func (client *Client) PrepareCommand(session *ssh.Session, cmd *Command) (err error) {
-// 	cmd.CMD = "source ~/.profile && " + cmd.CMD
-
-// 	for _, env := range cmd.Env {
-// 		variable := strings.Split(env, "=")
-// 		if len(variable) != 2 {
-// 			continue
-// 		}
-
-// 		if err := session.Setenv(variable[0], variable[1]); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	if cmd.Stdin != nil {
-// 		stdin, err := session.StdinPipe()
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		go io.Copy(stdin, cmd.Stdin)
-// 	}
-
-// 	if cmd.Stdout != nil {
-// 		stdout, err := session.StdoutPipe()
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		go io.Copy(cmd.Stdout, stdout)
-// 	}
-
-// 	if cmd.Stderr != nil {
-// 		stderr, err := session.StderrPipe()
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		go io.Copy(cmd.Stderr, stderr)
-// 	}
-
-// 	return
-// }
 
 // Close
 func (client *Client) Close() (err error) {
