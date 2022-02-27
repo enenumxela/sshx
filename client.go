@@ -2,7 +2,6 @@ package sshx
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"time"
 
@@ -27,24 +26,12 @@ type Configuration struct {
 	HostKeyCallback ssh.HostKeyCallback
 }
 
-type Command struct {
-	CMD    string
-	Env    []string
-	Stdin  io.Reader
-	Stdout io.Writer
-	Stderr io.Writer
-}
-
 // New create a new sshx NewClient
 func New(configuration *Configuration) (client *Client, err error) {
 	client = &Client{
 		SSH:  &ssh.Client{},
 		SFTP: &sftp.Client{},
 	}
-
-	// if configuration.Timeout == 0 {
-	// 	configuration.Timeout = 20
-	// }
 
 	if client.SSH, err = ssh.Dial("tcp", net.JoinHostPort(configuration.Addr, fmt.Sprint(configuration.Port)), &ssh.ClientConfig{
 		User:            configuration.User,
@@ -62,7 +49,7 @@ func New(configuration *Configuration) (client *Client, err error) {
 	return
 }
 
-// Close
+// Close closes the underlying client network connection.
 func (client *Client) Close() (err error) {
 	if client == nil {
 		return

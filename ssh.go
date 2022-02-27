@@ -9,6 +9,70 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+type Command struct {
+	CMD    string
+	Env    []string
+	Stdin  io.Reader
+	Stdout io.Writer
+	Stderr io.Writer
+}
+
+// RunCommand
+func (client *Client) RunCommand(command *Command) (err error) {
+	session, err := client.SSH.NewSession()
+	if err != nil {
+		return
+	}
+
+	defer session.Close()
+
+	for _, env := range command.Env {
+		variable := strings.Split(env, "=")
+		if len(variable) != 2 {
+			continue
+		}
+
+		if err := session.Setenv(variable[0], variable[1]); err != nil {
+			return err
+		}
+	}
+
+	if command.Stdin != nil {
+		stdin, err := session.StdinPipe()
+		if err != nil {
+			return err
+		}
+
+		go io.Copy(stdin, command.Stdin)
+	}
+
+	if command.Stdout != nil {
+		stdout, err := session.StdoutPipe()
+		if err != nil {
+			return err
+		}
+
+		go io.Copy(command.Stdout, stdout)
+	}
+
+	if command.Stderr != nil {
+		stderr, err := session.StderrPipe()
+		if err != nil {
+			return err
+		}
+
+		go io.Copy(command.Stderr, stderr)
+	}
+
+	command.CMD = "source ~/.profile && " + command.CMD
+
+	if err = session.Run(command.CMD); err != nil {
+		return
+	}
+
+	return
+}
+
 // GetShell
 func (client *Client) GetShell() (err error) {
 	session, err := client.SSH.NewSession()
@@ -64,66 +128,6 @@ func (client *Client) GetShell() (err error) {
 
 		return
 	}
-
-	return
-}
-
-// RunCommand
-func (client *Client) RunCommand(command *Command) (err error) {
-	session, err := client.SSH.NewSession()
-	if err != nil {
-		return
-	}
-
-	// defer session.Close()
-
-	for _, env := range command.Env {
-		variable := strings.Split(env, "=")
-		if len(variable) != 2 {
-			continue
-		}
-
-		if err := session.Setenv(variable[0], variable[1]); err != nil {
-			return err
-		}
-	}
-
-	if command.Stdin != nil {
-		stdin, err := session.StdinPipe()
-		if err != nil {
-			return err
-		}
-
-		go io.Copy(stdin, command.Stdin)
-	}
-
-	if command.Stdout != nil {
-		stdout, err := session.StdoutPipe()
-		if err != nil {
-			return err
-		}
-
-		go io.Copy(command.Stdout, stdout)
-	}
-
-	if command.Stderr != nil {
-		stderr, err := session.StderrPipe()
-		if err != nil {
-			return err
-		}
-
-		go io.Copy(command.Stderr, stderr)
-	}
-
-	command.CMD = "source ~/.profile && " + command.CMD
-
-	if err = session.Run(command.CMD); err != nil {
-		session.Close()
-
-		return
-	}
-
-	session.Close()
 
 	return
 }
