@@ -121,7 +121,7 @@ if err := client.Download("/path/to/remote/file", "/path/to/local/file"); err !=
 ### Run Remote Commands
 
 ```go
-if err = client.RunCommand(&sshx.Command{
+if err = client.Command(&sshx.Command{
     CMD:    "echo ${LC_TEST}",
     Env:    []string{"LC_TEST=working"},
     Stdin:  os.Stdin,
@@ -135,7 +135,7 @@ if err = client.RunCommand(&sshx.Command{
 ### Get an Interactive Shell
 
 ```go
-if err = client.GetShell(); err != nil {
+if err = client.Shell(); err != nil {
     log.Println(err)
 }
 ```

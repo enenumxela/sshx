@@ -10,23 +10,20 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// Client is the structure of sshx client.
 type Client struct {
 	SSH  *ssh.Client
 	SFTP *sftp.Client
 }
 
-// Configuration is the structure of configuration for sshx client.
 type Configuration struct {
 	Addr            string
-	Port            uint
+	Port            int
 	User            string
 	Timeout         int
 	Auth            authentication.Authentication
 	HostKeyCallback ssh.HostKeyCallback
 }
 
-// New create a new sshx NewClient
 func New(configuration *Configuration) (client *Client, err error) {
 	client = &Client{
 		SSH:  &ssh.Client{},
@@ -49,7 +46,6 @@ func New(configuration *Configuration) (client *Client, err error) {
 	return
 }
 
-// Close closes the underlying client network connection.
 func (client *Client) Close() (err error) {
 	if client == nil {
 		return

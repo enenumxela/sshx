@@ -17,14 +17,11 @@ type Command struct {
 	Stderr io.Writer
 }
 
-// RunCommand
-func (client *Client) RunCommand(command *Command) (err error) {
+func (client *Client) Command(command *Command) (err error) {
 	session, err := client.SSH.NewSession()
 	if err != nil {
 		return
 	}
-
-	defer session.Close()
 
 	for _, env := range command.Env {
 		variable := strings.Split(env, "=")
@@ -35,6 +32,22 @@ func (client *Client) RunCommand(command *Command) (err error) {
 		if err := session.Setenv(variable[0], variable[1]); err != nil {
 			return err
 		}
+	}
+
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,
+		ssh.TTY_OP_ISPEED: 14400,
+		ssh.TTY_OP_OSPEED: 14400,
+	}
+
+	term := os.Getenv("TERM")
+
+	if term == "" {
+		term = "xterm-256color"
+	}
+
+	if err = session.RequestPty(term, 40, 80, modes); err != nil {
+		return
 	}
 
 	if command.Stdin != nil {
@@ -64,26 +77,21 @@ func (client *Client) RunCommand(command *Command) (err error) {
 		go io.Copy(command.Stderr, stderr)
 	}
 
-	command.CMD = "source ~/.profile && " + command.CMD
-
-	if err = session.Run(command.CMD); err != nil {
-		return
-	}
-
-	return
+	return session.Run(command.CMD)
 }
 
-// GetShell
-func (client *Client) GetShell() (err error) {
+func (client *Client) Shell() (err error) {
 	session, err := client.SSH.NewSession()
 	if err != nil {
 		return
 	}
 
+	defer session.Close()
+
 	modes := ssh.TerminalModes{
-		ssh.ECHO:          1,     // enable echoing
-		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
-		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+		ssh.ECHO:          1,
+		ssh.TTY_OP_ISPEED: 14400,
+		ssh.TTY_OP_OSPEED: 14400,
 	}
 
 	term := os.Getenv("TERM")
@@ -110,24 +118,13 @@ func (client *Client) GetShell() (err error) {
 		return
 	}
 
+	session.Stdin = os.Stdin
 	session.Stdout = os.Stdout
 	session.Stderr = os.Stderr
-	session.Stdin = os.Stdin
 
 	if err = session.Shell(); err != nil {
 		return
 	}
 
-	if err = session.Wait(); err != nil {
-		if e, ok := err.(*ssh.ExitError); ok {
-			switch e.ExitStatus() {
-			case 130:
-				return nil
-			}
-		}
-
-		return
-	}
-
-	return
+	return session.Wait()
 }

@@ -4,11 +4,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 )
 
-// Upload a file to the SRC server // Upload file to sftp server
 func (client *Client) Upload(SRC, DEST string) (err error) {
 	directory, filename := filepath.Split(DEST)
 
@@ -33,26 +31,6 @@ func (client *Client) Upload(SRC, DEST string) (err error) {
 
 		if _, err = io.Copy(DESTFile, SRCFile); err != nil {
 			return err
-		}
-	}
-
-	return
-}
-
-func (client *Client) MkdirAll(DIR string) (err error) {
-	path := string(filepath.Separator)
-	directories := strings.Split(DIR, path)
-
-	for _, directory := range directories {
-		path = filepath.Join(path, directory)
-
-		_, err := client.SFTP.Lstat(path)
-		if err == nil {
-			continue
-		}
-
-		if err := client.SFTP.Mkdir(path); err != nil {
-			break
 		}
 	}
 
