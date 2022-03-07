@@ -7,7 +7,7 @@ A [Go(Golang)](https://golang.org/) package to provide a simple abstraction arou
 * [Features](#features)
 * [Installation](#installation)
 * [Usage](#usage)
-    * [Start Connection With Password](#start-connection-with-password)
+    * [Start Connection with Password](#start-connection-with-password)
     * [Start Connection with private key (With Passphrase)](#start-connection-with-private-key-with-passphrase)
     * [Start Connection With Private Key (Without Passphrase)](#start-connection-with-private-key-without-passphrase)
     * [Upload Local File to Remote](#upload-local-file-to-remote)
@@ -36,7 +36,7 @@ go get -u github.com/enenumxela/sshx
 
 ## Usage
 
-### Start Connection With Password
+### Start Connection with Password
 
 ```go
 authentication, err := authentication.Password("Password")

@@ -7,6 +7,26 @@ import (
 	"sync"
 )
 
+// func (client *Client) MkdirAll(DIR string) (err error) {
+// 	path := string(filepath.Separator)
+// 	directories := strings.Split(DIR, path)
+
+// 	for _, directory := range directories {
+// 		path = filepath.Join(path, directory)
+
+// 		_, err := client.SFTP.Lstat(path)
+// 		if err == nil {
+// 			continue
+// 		}
+
+// 		if err := client.SFTP.Mkdir(path); err != nil {
+// 			break
+// 		}
+// 	}
+
+// 	return
+// }
+
 func (client *Client) Upload(SRC, DEST string) (err error) {
 	directory, filename := filepath.Split(DEST)
 
