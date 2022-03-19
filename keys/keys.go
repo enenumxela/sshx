@@ -35,6 +35,25 @@ GENERATE:
 	return pub, priv, nil
 }
 
+func Read(keyPair string) (string, string, error) {
+	_, err := os.Stat(keyPair)
+	if err != nil {
+		return "", "", err
+	}
+
+	priv, err := ioutil.ReadFile(keyPair)
+	if err != nil {
+		return "", "", err
+	}
+
+	pub, err := ioutil.ReadFile(keyPair + ".pub")
+	if err != nil {
+		return "", "", err
+	}
+
+	return string(pub), string(priv), nil
+}
+
 func Generate() (string, string, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -60,25 +79,6 @@ func Generate() (string, string, error) {
 	public := ssh.MarshalAuthorizedKey(pub)
 
 	return string(public), private.String(), nil
-}
-
-func Read(keyPair string) (string, string, error) {
-	_, err := os.Stat(keyPair)
-	if err != nil {
-		return "", "", err
-	}
-
-	priv, err := ioutil.ReadFile(keyPair)
-	if err != nil {
-		return "", "", err
-	}
-
-	pub, err := ioutil.ReadFile(keyPair + ".pub")
-	if err != nil {
-		return "", "", err
-	}
-
-	return string(pub), string(priv), nil
 }
 
 func Write(keyPairName, pub, priv string) error {
