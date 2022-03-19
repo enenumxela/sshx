@@ -1,5 +1,7 @@
 # sshx
 
+![maintenance](https://img.shields.io/badge/maintained%3F-yes-0040ff.svg) [![open issues](https://img.shields.io/github/issues-raw/enenumxela/sshx.svg?style=flat&color=0040ff)](https://github.com/enenumxela/sshx/issues?q=is:issue+is:open) [![closed issues](https://img.shields.io/github/issues-closed-raw/enenumxela/sshx.svg?style=flat&color=0040ff)](https://github.com/enenumxela/sshx/issues?q=is:issue+is:closed) [![license](https://img.shields.io/badge/license-MIT-gray.svg?colorB=0040FF)](https://github.com/enenumxela/sshx/blob/master/LICENSE) [![twitter](https://img.shields.io/badge/twitter-@enenumxela-0040ff.svg)](https://twitter.com/enenumxela)
+
 A [Go(Golang)](https://golang.org/) package to provide a simple abstraction around [ssh](https://pkg.go.dev/golang.org/x/crypto/ssh) and [sftp](https://pkg.go.dev/github.com/pkg/sftp) packages.
 
 ## Resources
@@ -14,6 +16,7 @@ A [Go(Golang)](https://golang.org/) package to provide a simple abstraction arou
     * [Get an interactive shell](#get-an-interactive-shell)
     * [Upload Local File to Remote](#upload-local-file-to-remote)
     * [Download Remote File to Local](#download-remote-file-to-local)
+* [Contribution](#contribution)
 
 ## Features
 
@@ -138,3 +141,7 @@ if err := client.Download("/path/to/remote/file", "/path/to/local/file"); err !=
     log.Println(err)
 }
 ```
+
+## Contribution
+
+[Issues](https://github.com/enenumxela/sshx/issues) and [Pull Requests](https://github.com/enenumxela/sshx/pulls) are welcome! 
